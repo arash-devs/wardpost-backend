@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wardpost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #0B1220;
+    --harbor: #131B2E;
+    --harbor-light: #1B2740;
+    --border: #243349;
+    --gold: #E8A94C;
+    --gold-dim: #B98432;
+    --foam: #E7EDF2;
+    --mist: #7C8CA8;
+    --rust: #C4573F;
+    --green: #5FB88A;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2.5rem 1.5rem;
+    background: var(--ink);
+    color: var(--foam);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .container { max-width: 860px; margin: 0 auto; }
+
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 12px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--mist);
+  }
+  .brand .sep { color: var(--border); }
+  .brand .studio {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    color: var(--foam);
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.05em;
+    background: var(--harbor-light);
+    border: 1px solid var(--border);
+    color: var(--mist);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot.stale { background: var(--gold); }
+  .dot.dead { background: var(--rust); }
+
+  .beacon-card {
+    display: flex; align-items: center; gap: 28px;
+    background: var(--harbor);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .gauge-wrap { position: relative; width: 160px; height: 160px; flex-shrink: 0; }
+  .gauge-score {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .gauge-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 34px; font-weight: 600;
+  }
+  .gauge-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    color: var(--mist); margin-top: 2px;
+  }
+  .beacon-copy { flex: 1; min-width: 220px; }
+  .beacon-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em;
+    color: var(--mist); margin: 0 0 6px;
+  }
+  .beacon-headline {
+    font-family: 'Fraunces', serif;
+    font-size: 19px; margin: 0 0 8px; line-height: 1.4;
+  }
+  .beacon-sub {
+    font-size: 14px; color: var(--mist); margin: 0; line-height: 1.6;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.14em;
+    color: var(--mist); margin: 0 0 10px;
+  }
+
+  .moorings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .mooring-card {
+    background: var(--harbor);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem;
+  }
+  .mooring-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .mooring-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+  }
+  .mooring-meta {
+    display: flex; gap: 18px; margin-bottom: 10px;
+  }
+  .mooring-meta .stat {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+  }
+  .mooring-meta .stat-label {
+    font-size: 11px; color: var(--mist); margin: 0;
+  }
+  .mooring-note { font-size: 12.5px; color: var(--mist); margin: 0; line-height: 1.5; }
+  .mooring-endpoint {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--mist);
+    word-break: break-all;
+  }
+
+  .log-card {
+    background: var(--harbor);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+  .log-entry {
+    display: flex; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-entry:first-of-type { padding-top: 0; }
+  .log-severity {
+    width: 6px; border-radius: 3px; flex-shrink: 0;
+    background: var(--mist);
+  }
+  .log-severity.warning { background: var(--gold); }
+  .log-severity.critical { background: var(--rust); }
+  .log-body { flex: 1; }
+  .log-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px; color: var(--mist);
+  }
+  .log-text { font-size: 12.5px; margin: 2px 0 0; line-height: 1.5; }
+
+  .empty { color: var(--mist); font-style: italic; font-size: 13px; padding: 8px 0; }
+  .error-banner {
+    background: rgba(196, 87, 63, 0.12);
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 1.5rem;
+  }
+  .footer-note {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--mist); font-size: 11.5px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="masthead">
+    <div class="brand">
+      <span>⚓ WARDPOST</span>
+      <span class="sep">/</span>
+      <span class="studio" id="studio-name">demo studio</span>
+    </div>
+    <div class="status-pill">
+      <span class="dot live" id="live-dot"></span>
+      <span id="live-status">connecting…</span>
+    </div>
+  </div>
+
+  <div id="error-banner-slot"></div>
+
+  <div class="beacon-card">
+    <div class="gauge-wrap">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="62" fill="none" stroke="var(--border)" stroke-width="10" />
+        <circle
+          id="gauge-ring"
+          cx="80" cy="80" r="62" fill="none"
+          stroke="var(--green)" stroke-width="10"
+          stroke-linecap="round"
+          stroke-dasharray="389.56"
+          stroke-dashoffset="389.56"
+          transform="rotate(-90 80 80)"
+          style="transition: stroke-dashoffset 1s ease, stroke 1s ease;"
+        />
+      </svg>
+      <div class="gauge-score">
+        <span class="gauge-num" id="gauge-num">–</span>
+        <span class="gauge-label" id="gauge-label">CONNECTING</span>
+      </div>
+    </div>
+    <div class="beacon-copy">
+      <p class="beacon-eyebrow">BEACON STRENGTH</p>
+      <p class="beacon-headline" id="beacon-headline">Awaiting first reading…</p>
+      <p class="beacon-sub" id="beacon-sub">The poller is starting up. Data will appear within one poll cycle.</p>
+    </div>
+  </div>
+
+  <p class="section-label">MOORINGS</p>
+  <div class="moorings-grid" id="moorings-grid">
+    <p class="empty">No moorings yet.</p>
+  </div>
+
+  <p class="section-label">KEEPER'S LOG</p>
+  <div class="log-card" id="log-card">
+    <p class="empty">No log entries yet.</p>
+  </div>
+
+  <div class="footer-note">
+    <span>📡</span>
+    <span id="footer-note-text">Last checked: never</span>
+  </div>
+
+</div>
+
+<script>
+  const API_BASE = window.location.origin;
+  const POLL_MS = 5000;  // dashboard refreshes every 5s; backend polls Edgegap every 30s
+
+  // ────────── helpers ──────────
+  const $ = (id) => document.getElementById(id);
+  const escapeHtml = (str) =>
+    String(str ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
+
+  const statusColorVar = (status) => ({
+    healthy: "var(--green)",
+    warning: "var(--gold)",
+    critical: "var(--rust)",
+  }[status] || "var(--mist)");
+
+  // ────────── renderers ──────────
+  function renderBeacon(beacon) {
+    const score = beacon?.score ?? 0;
+    const circumference = 2 * Math.PI * 62;
+    const offset = circumference * (1 - score / 100);
+    const ring = $("gauge-ring");
+    const color =
+      score >= 80 ? "var(--green)" :
+      score >= 50 ? "var(--gold)" : "var(--rust)";
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = color;
+
+    $("gauge-num").textContent = score;
+    $("gauge-label").textContent =
+      score >= 80 ? "HOLDING STEADY" :
+      score >= 50 ? "WATCH ADVISED" : "TAKE ACTION";
+
+    if (beacon.status === "no_data") {
+      $("beacon-headline").textContent = "No deployments configured.";
+      $("beacon-sub").textContent = "Set EDGEGAP_REQUEST_ID in .env and restart the backend.";
+    } else if (beacon.status === "holding_steady") {
+      $("beacon-headline").textContent = "All moorings holding steady.";
+      $("beacon-sub").textContent = "Servers are healthy and accepting players.";
+    } else if (beacon.status === "watch_advised") {
+      $("beacon-headline").textContent = "Some moorings need attention.";
+      $("beacon-sub").textContent = "One or more servers are booting or elevated.";
+    } else {
+      $("beacon-headline").textContent = "Take action.";
+      $("beacon-sub").textContent = "One or more servers are down or errored.";
+    }
+
+    const errorSlot = $("error-banner-slot");
+    if (beacon.lastError) {
+      errorSlot.innerHTML =
+        `<div class="error-banner">Backend error: ${escapeHtml(beacon.lastError)}</div>`;
+    } else {
+      errorSlot.innerHTML = "";
+    }
+  }
+
+  function renderMoorings(moorings) {
+    const grid = $("moorings-grid");
+    if (!moorings || moorings.length === 0) {
+      grid.innerHTML = `<p class="empty">No moorings yet — waiting for the first poll to complete.</p>`;
+      return;
+    }
+    grid.innerHTML = moorings.map((m) => {
+      const portsHtml = Object.entries(m.ports || {}).map(
+        ([name, info]) =>
+          `<div>${escapeHtml(name)}: ${escapeHtml(m.publicIp || m.fqdn || "?")}:${escapeHtml(info?.external || "?")}</div>`
+      ).join("");
+      return `
+        <div class="mooring-card">
+          <div class="mooring-head">
+            <span class="mooring-name">${escapeHtml(m.name)}</span>
+            <span class="dot" style="background: ${statusColorVar(m.status)}"></span>
+          </div>
+          <div class="mooring-meta">
+            <div>
+              <div class="stat">${escapeHtml(m.statusLabel)}</div>
+              <p class="stat-label">state</p>
+            </div>
+            <div>
+              <div class="stat">${Math.floor((m.uptimeSeconds || 0) / 60)}m ${(m.uptimeSeconds || 0) % 60}s</div>
+              <p class="stat-label">uptime</p>
+            </div>
+          </div>
+          <p class="mooring-note">${escapeHtml(m.note)}</p>
+          ${portsHtml ? `<div class="mooring-endpoint">${portsHtml}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderLog(log) {
+    const card = $("log-card");
+    if (!log || log.length === 0) {
+      card.innerHTML = `<p class="empty">No events yet.</p>`;
+      return;
+    }
+    card.innerHTML = log.map((entry) => `
+      <div class="log-entry">
+        <div class="log-severity ${escapeHtml(entry.severity)}"></div>
+        <div class="log-body">
+          <span class="log-time">${escapeHtml(entry.time)}</span>
+          <p class="log-text">${escapeHtml(entry.text)}</p>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // ────────── data flow ──────────
+  async function refresh() {
+    try {
+      const [beaconRes, mooringsRes, logRes] = await Promise.all([
+        fetch(`${API_BASE}/api/beacon`),
+        fetch(`${API_BASE}/api/moorings`),
+        fetch(`${API_BASE}/api/log`),
+      ]);
+      if (!beaconRes.ok || !mooringsRes.ok || !logRes.ok) {
+        throw new Error(`Backend returned non-OK status`);
+      }
+      const beacon = await beaconRes.json();
+      const { moorings, lastUpdated } = await mooringsRes.json();
+      const { log } = await logRes.json();
+
+      renderBeacon(beacon);
+      renderMoorings(moorings);
+      renderLog(log);
+
+      $("live-dot").className = "dot live";
+      $("live-status").textContent = "live";
+      $("footer-note-text").textContent = lastUpdated
+        ? `Last checked: ${new Date(lastUpdated).toLocaleTimeString()}`
+        : "Waiting for first poll…";
+    } catch (err) {
+      $("live-dot").className = "dot dead";
+      $("live-status").textContent = "backend offline";
+      $("footer-note-text").textContent = "Cannot reach backend at " + API_BASE;
+    }
+  }
+
+  refresh();
+  setInterval(refresh, POLL_MS);
+</script>
+</body>
+</html>
